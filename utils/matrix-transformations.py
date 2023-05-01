@@ -43,3 +43,9 @@ def four_point_transform(img, pts):
     M = cv2.getPerspectiveTransform(rect, dst)
     warped = cv2.warpPerspective(img, M, (width, height))
     return warped
+
+def resize(img, new_width):
+    """Resizes image to new_width while maintaining its ratio"""
+    height, width = img.shape[:2]
+    ratio = height / width
+    return cv2.resize(img, (new_width, int(ratio * new_width)))
