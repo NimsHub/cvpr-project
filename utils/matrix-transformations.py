@@ -21,3 +21,25 @@ def order_points(pts):
     rect[1] = pts[np.argmin(_diff)]
     rect[3] = pts[np.argmax(_diff)]
     return rect
+
+def four_point_transform(img, pts):
+    """Returns 'bird view' of image"""
+    rect = order_points(pts)
+    tl, tr, br, bl = rect
+    # width of new image will be the max difference between
+    # bottom-right - bottom-left or top-right - top-left
+    widthA = np.linalg.norm(br - bl)
+    widthB = np.linalg.norm(tr - tl)
+    width = int(round(max(widthA, widthB)))
+    # Same goes for height
+    heightA = np.linalg.norm(tr - br)
+    heightB = np.linalg.norm(tl - bl)
+    height = int(round(max(heightA, heightB)))
+    # construct destination for 'birds eye view'
+    dst = np.array([
+        [0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]],
+        dtype=np.float32)
+    # compute perspective transform and apply it
+    M = cv2.getPerspectiveTransform(rect, dst)
+    warped = cv2.warpPerspective(img, M, (width, height))
+    return warped
